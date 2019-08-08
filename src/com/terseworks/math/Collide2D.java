@@ -79,47 +79,28 @@ public class Collide2D
 	public static void pointInRectangle(Vector2D point, Rectangle2D rectangle, Contact2D contact)
 	{
 		float distanceX1 = point.x - rectangle.min.x;
-		float distanceX2 = rectangle.max.x - point.x;
 		float distanceY1 = point.y - rectangle.min.y;
+		float distanceX2 = rectangle.max.x - point.x;
 		float distanceY2 = rectangle.max.y - point.y;
 
-		float distanceX;
-		if (distanceX1 < distanceX2)
-		{
-			contact.normal.x = -1.0F;
-			distanceX = distanceX1;
-		}
-		else
-		{
-			contact.normal.x = 1.0F;
-			distanceX = distanceX2;
-		}
-
-		float distanceY;
-		if (distanceY1 < distanceY2)
-		{
-			contact.normal.y = -1.0F;
-			distanceY = distanceY1;
-		}
-		else
-		{
-			contact.normal.y = 1.0F;
-			distanceY = distanceY2;
-		}
-
+		float distanceX = Math.min(distanceX1, distanceX2);
+		float distanceY = Math.min(distanceY1, distanceY2);
+		float distance = Math.min(distanceX, distanceY);
+		
 		if (distanceX < distanceY)
 		{
+			contact.normal.x = (distanceX1 < distanceX2) ? -1.0F : 1.0F;
 			contact.normal.y = 0.0F;
-			contact.depth = Math.max(0.0F, distanceX);
 		}
 		else
 		{
 			contact.normal.x = 0.0F;
-			contact.depth = Math.max(0.0F, distanceY);
+			contact.normal.y = (distanceY1 < distanceY2) ? -1.0F : 1.0F;
 		}
-
+		
 		contact.tangent.x = contact.normal.y;
 		contact.tangent.y = -contact.normal.x;
+		contact.depth = Math.max(0.0F, distance);
 	}
 
 	/*
@@ -208,44 +189,25 @@ public class Collide2D
 		else
 		{
 			float distanceX1 = (circle.center.x + circle.radius) - rectangle.min.x;
-			float distanceX2 = rectangle.max.x - (circle.center.x - circle.radius);
 			float distanceY1 = (circle.center.y + circle.radius) - rectangle.min.y;
+			float distanceX2 = rectangle.max.x - (circle.center.x - circle.radius);
 			float distanceY2 = rectangle.max.y - (circle.center.y - circle.radius);
-
-			float distanceX;
-			if (distanceX1 < distanceX2)
-			{
-				contact.normal.x = -1.0F;
-				distanceX = distanceX1;
-			}
-			else
-			{
-				contact.normal.x = 1.0F;
-				distanceX = distanceX2;
-			}
-
-			float distanceY;
-			if (distanceY1 < distanceY2)
-			{
-				contact.normal.y = -1.0F;
-				distanceY = distanceY1;
-			}
-			else
-			{
-				contact.normal.y = 1.0F;
-				distanceY = distanceY2;
-			}
+			
+			float distanceX = Math.min(distanceX1, distanceX2);
+			float distanceY = Math.min(distanceY1, distanceY2);
+			float distance = Math.min(distanceX, distanceY);
 
 			if (distanceX < distanceY)
 			{
+				contact.normal.x = (distanceX1 < distanceX2) ? -1.0F : 1.0F;
 				contact.normal.y = 0.0F;
-				contact.depth = Math.max(0.0F, distanceX);
 			}
 			else
 			{
 				contact.normal.x = 0.0F;
-				contact.depth = Math.max(0.0F, distanceY);
+				contact.normal.y = (distanceY1 < distanceY2) ? -1.0F : 1.0F;
 			}
+			contact.depth = Math.max(0.0F, distance);
 		}
 
 		contact.tangent.x = contact.normal.y;
@@ -258,42 +220,29 @@ public class Collide2D
 	 */
 	public static void rectangleInPlane(Rectangle2D rectangle, Plane2D plane, Contact2D contact)
 	{
-		float distanceCorner1 = (rectangle.min.x * plane.normal.x) + (rectangle.min.y * plane.normal.y) + plane.offset;
-		float distanceCorner2 = (rectangle.min.x * plane.normal.x) + (rectangle.max.y * plane.normal.y) + plane.offset;
-		float distanceCorner3 = (rectangle.max.x * plane.normal.x) + (rectangle.min.y * plane.normal.y) + plane.offset;
-		float distanceCorner4 = (rectangle.max.x * plane.normal.x) + (rectangle.max.y * plane.normal.y) + plane.offset;
-
 		float rectangleExtentX = (rectangle.max.x - rectangle.min.x) * 0.5F;
 		float rectangleExtentY = (rectangle.max.y - rectangle.min.y) * 0.5F;
 		float rectangleCenterX = rectangle.min.x + rectangleExtentX;
 		float rectangleCenterY = rectangle.min.y + rectangleExtentY;
 
+		float projection = (rectangleExtentX * Math.abs(plane.normal.x)) + (rectangleExtentY * Math.abs(plane.normal.y));
 		float distance = (rectangleCenterX * plane.normal.x) + (rectangleCenterY * plane.normal.y) + plane.offset;
+		float absoluteDistance = Math.abs(distance);
+		
 		if (distance < 0.0F)
 		{
-			float distanceCorner = distanceCorner1;
-			distanceCorner = Math.max(distanceCorner, distanceCorner2);
-			distanceCorner = Math.max(distanceCorner, distanceCorner3);
-			distanceCorner = Math.max(distanceCorner, distanceCorner4);
-
 			contact.normal.x = -plane.normal.x;
 			contact.normal.y = -plane.normal.y;
-			contact.depth = Math.max(0.0F, distanceCorner);
 		}
 		else
 		{
-			float distanceCorner = distanceCorner1;
-			distanceCorner = Math.min(distanceCorner, distanceCorner2);
-			distanceCorner = Math.min(distanceCorner, distanceCorner3);
-			distanceCorner = Math.min(distanceCorner, distanceCorner4);
-
 			contact.normal.x = plane.normal.x;
 			contact.normal.y = plane.normal.y;
-			contact.depth = Math.max(0.0F, -distanceCorner);
 		}
-
+		
 		contact.tangent.x = contact.normal.y;
 		contact.tangent.y = -contact.normal.x;
+		contact.depth = Math.max(0.0F, projection - absoluteDistance);
 	}
 
 	/*
@@ -302,20 +251,19 @@ public class Collide2D
 	 */
 	public static void rectangleInHalfspace(Rectangle2D rectangle, Plane2D halfspace, Contact2D contact)
 	{
-		float distanceCorner1 = (rectangle.min.x * halfspace.normal.x) + (rectangle.min.y * halfspace.normal.y) + halfspace.offset;
-		float distanceCorner2 = (rectangle.min.x * halfspace.normal.x) + (rectangle.max.y * halfspace.normal.y) + halfspace.offset;
-		float distanceCorner3 = (rectangle.max.x * halfspace.normal.x) + (rectangle.min.y * halfspace.normal.y) + halfspace.offset;
-		float distanceCorner4 = (rectangle.max.x * halfspace.normal.x) + (rectangle.max.y * halfspace.normal.y) + halfspace.offset;
-		float distanceCorner = distanceCorner1;
-		distanceCorner = Math.min(distanceCorner, distanceCorner2);
-		distanceCorner = Math.min(distanceCorner, distanceCorner3);
-		distanceCorner = Math.min(distanceCorner, distanceCorner4);
+		float rectangleExtentX = (rectangle.max.x - rectangle.min.x) * 0.5F;
+		float rectangleExtentY = (rectangle.max.y - rectangle.min.y) * 0.5F;
+		float rectangleCenterX = rectangle.min.x + rectangleExtentX;
+		float rectangleCenterY = rectangle.min.y + rectangleExtentY;
 
+		float projection = (rectangleExtentX * Math.abs(halfspace.normal.x)) + (rectangleExtentY * Math.abs(halfspace.normal.y));
+		float distance = (rectangleCenterX * halfspace.normal.x) + (rectangleCenterY * halfspace.normal.y) + halfspace.offset;
+		
 		contact.normal.x = halfspace.normal.x;
 		contact.normal.y = halfspace.normal.y;
 		contact.tangent.x = contact.normal.y;
 		contact.tangent.y = -contact.normal.x;
-		contact.depth = Math.max(0.0F, -distanceCorner);
+		contact.depth = Math.max(0.0F, projection - distance);
 	}
 
 	/*
@@ -325,46 +273,27 @@ public class Collide2D
 	public static void rectangleInRectangle(Rectangle2D rectangle1, Rectangle2D rectangle2, Contact2D contact)
 	{
 		float distanceX1 = rectangle1.max.x - rectangle2.min.x;
-		float distanceX2 = rectangle2.max.x - rectangle1.min.x;
 		float distanceY1 = rectangle1.max.y - rectangle2.min.y;
+		float distanceX2 = rectangle2.max.x - rectangle1.min.x;
 		float distanceY2 = rectangle2.max.y - rectangle1.min.y;
 
-		float distanceX;
-		if (distanceX1 < distanceX2)
-		{
-			contact.normal.x = -1.0F;
-			distanceX = distanceX1;
-		}
-		else
-		{
-			contact.normal.x = 1.0F;
-			distanceX = distanceX2;
-		}
-
-		float distanceY;
-		if (distanceY1 < distanceY2)
-		{
-			contact.normal.y = -1.0F;
-			distanceY = distanceY1;
-		}
-		else
-		{
-			contact.normal.y = 1.0F;
-			distanceY = distanceY2;
-		}
-
+		float distanceX = Math.min(distanceX1, distanceX2);
+		float distanceY = Math.min(distanceY1, distanceY2);
+		float distance = Math.min(distanceX, distanceY);
+		
 		if (distanceX < distanceY)
 		{
+			contact.normal.x = (distanceX1 < distanceX2) ? -1.0F : 1.0F;
 			contact.normal.y = 0.0F;
-			contact.depth = Math.max(0.0F, distanceX);
 		}
 		else
 		{
 			contact.normal.x = 0.0F;
-			contact.depth = Math.max(0.0F, distanceY);
+			contact.normal.y = (distanceY1 < distanceY2) ? -1.0F : 1.0F;
 		}
-
+		
 		contact.tangent.x = contact.normal.y;
 		contact.tangent.y = -contact.normal.x;
+		contact.depth = Math.max(0.0F, distance);
 	}
 }
