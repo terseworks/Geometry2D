@@ -1,6 +1,9 @@
 //********************************************************************************
 // Contact2D.java
 //
+// (C) 2019 TerseWorks. All rights reserved.
+// TerseWorks Public Code License (https://www.terseworks.com/licensing).
+//
 // Written by: John Meschke
 // Description: Contains contact information about the result of a collision
 //              between shapes in 2D space.

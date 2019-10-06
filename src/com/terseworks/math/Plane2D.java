@@ -1,6 +1,9 @@
 //********************************************************************************
 // Plane2D.java
 //
+// (C) 2019 TerseWorks. All rights reserved.
+// TerseWorks Public Code License (https://www.terseworks.com/licensing).
+//
 // Written by: John Meschke
 // Description: A floating point plane or halfspace in 2D space. Takes the form of
 //              (normal.x * X) + (normal.y * Y) + offset = 0.

@@ -1,6 +1,9 @@
 //********************************************************************************
 // RayCast2D.java
 //
+// (C) 2019 TerseWorks. All rights reserved.
+// TerseWorks Public Code License (https://www.terseworks.com/licensing).
+//
 // Written by: John Meschke
 // Description: Methods used for ray casting on 2D geometry. All methods assume
 //              valid shapes (example: unit normals, positive radii, etc.).
